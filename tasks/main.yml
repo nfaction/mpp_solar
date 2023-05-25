@@ -1,0 +1,64 @@
+---
+# tasks file for mpp_solar
+
+- name: install Debian pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ deb_packages }}"
+
+- name: install pip packages
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ pip_packages }}"
+
+- name: create required dirs
+  file:
+    path: "{{ item.path }}"
+    state: directory
+  with_items: "{{ req_dirs }}"
+
+# tmpfs /ramdisk tmpfs nodev,nosuid,size=1M 0 0
+- name: configure fstab
+  ansible.posix.mount:
+    fstype: tmpfs
+    src: tmpfs
+    path: /ramdisk
+    opts: "nodev,nosuid,size=1M"
+    state: mounted
+
+- name: create solar user
+  user:
+    name: solar
+    state: present
+    shell: /bin/bash
+
+- name: get Prometheus and NodeExporter
+  get_url:
+    url: "{{ item.url }}"
+    dest: "/home/solar/{{ item.file }}"
+    owner: solar
+    group: solar
+  with_items: "{{ prom_nodeex_archives }}"
+
+- name: unarchive both archives
+  unarchive:
+    src: "/home/solar/{{ item.file }}"
+    dest: "/home/solar"
+    remote_src: true
+  with_items: "{{ prom_nodeex_archives }}"
+
+- name: template prometheus.yml
+  template:
+    src: prometheus.yml.j2
+    dest: /home/solar/prometheus-2.19.0.linux-armv6/prometheus.yml
+    owner: solar
+    group: solar
+
+- name: template prometheus service
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+  notify:
+    - restart prometheus

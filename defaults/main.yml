@@ -1,0 +1,36 @@
+---
+# defaults file for mpp_solar
+
+deb_packages:
+  - python3-pip
+#  - adduser
+#  - libfontconfig1
+
+pip_packages:
+  - pyserial
+  - minimalmodbus
+
+req_dirs:
+  - name: ramdisk
+    path: /ramdisk
+
+# Prometheus + NodeExporter
+solar_home_dir: "/home/solar"
+prom_dir: "prometheus-2.19.0.linux-armv6"
+nodeex_dir: "node_exporter-1.0.0.linux-armv6"
+
+prom_tar: "{{ prom_dir }}.tar.gz"
+nodeex_tar: "{{ nodeex_dir }}.tar.gz"
+
+prom_full_path: "{{ solar_home_dir }}/{{ prom_dir }}"
+
+prom_nodeex_archives:
+  - name: prometheus
+    url: "https://github.com/prometheus/prometheus/releases/download/v2.19.0/prometheus-2.19.0.linux-armv6.tar.gz"
+    file: "{{ prom_tar }}"
+  - name: node exporter
+    url: "https://github.com/prometheus/node_exporter/releases/download/v1.0.0/node_exporter-1.0.0.linux-armv6.tar.gz"
+    file: "{{ nodeex_tar }}"
+
+#"/home/solar/prometheus-2.19.0.linux-armv6"
+#"/home/solar/node_exporter-1.0.0.linux-armv6"

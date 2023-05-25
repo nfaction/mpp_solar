@@ -1,0 +1,14 @@
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=solar
+Group=solar
+Type=simple
+ExecStart=bash -c "cd {{ prom_full_path }} ; {{ prom_full_path }}/prometheus"
+ExecStop=pkill -f prometheus
+
+[Install]
+WantedBy=multi-user.target
