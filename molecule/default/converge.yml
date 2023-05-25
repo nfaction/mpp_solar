@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include nfaction.mpp_solar"
+      include_role:
+        name: "nfaction.mpp_solar"
